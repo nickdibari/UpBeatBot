@@ -57,26 +57,25 @@ def main():
 	
 	if mentions:
 		print('Got {0} mentions'.format(len(mentions)))
+		for mention in mentions:
+			user = mention.user.screen_name
+
+			if not mention.favorited:
+				text = 'Hey @{0}, hope this brightens your day!'.format(user)
+				img = GetImage()
+
+				status = conx.PostUpdate(text,img)
+
+				if status:
+					print('Tweeted at {0} OK'.format(user))
+				
+				conx.CreateFavorite(status=mention)
+
+			else:
+				print('Already tweeted @{0}'.format(user))
 
 	else:
 		print('Got no mentions')
-	
-	for mention in mentions:
-		user = mention.user.screen_name
-
-		if not mention.favorited:
-			text = 'Hey @{0}, hope this brightens your day!'.format(user)
-			img = GetImage()
-
-			status = conx.PostUpdate(text,img)
-
-			if status:
-				print('Tweeted at {0} OK'.format(user))
-			
-			conx.CreateFavorite(status=mention)
-
-		else:
-			print('Already tweeted @{0}'.format(user))
 
 if __name__ == '__main__':
 	main()
