@@ -81,7 +81,7 @@ def main():
 			conx.CreateFavorite(status=mention)
 
 		else:
-			print('Alreadt tweeted @{0}'.format(user))
+			print('Already tweeted @{0}'.format(user))
 
 if __name__ == '__main__':
 	main()
