@@ -8,16 +8,11 @@ import bs4
 import random
 import requests
 import twitter
-
-CONSUMER_KEY = ''
-CONSUMER_SECRET = ''
-ACCESS_TOKEN = ''
-ACCESS_TOKEN_SECRET = ''
+from auth_example import *
 
 # PRE: N/A
 # POST: Connection to twitter API
 def ConnectAPI():
-	# DELETE BEFORE PUSHING
 	api = twitter.Api(CONSUMER_KEY, CONSUMER_SECRET,\
 			  ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 	return api
