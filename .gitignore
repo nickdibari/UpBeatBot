@@ -1,3 +1,4 @@
+*.log
 *.pyc
 
-auth_example.py
+twitter_auth.py
