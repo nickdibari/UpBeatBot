@@ -11,7 +11,7 @@ import requests
 import twitter
 import time
 
-from twiter_auth import *
+from twitter_auth import *
 
 # PRE: N/A
 # POST: Connection to twitter API
@@ -65,7 +65,7 @@ def GetImage():
 # Main Driver
 def main():
 	logging.basicConfig(filename='dev.log', level=logging.DEBUG)
-	
+
 	conx = ConnectAPI()
 	
 	if conx:
