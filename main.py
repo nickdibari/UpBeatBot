@@ -64,7 +64,7 @@ def GetImage():
 
 # Main Driver
 def main():
-	logging.basicConfig(filename='dev.log', level=logging.DEBUG)
+	logging.basicConfig(filename='dev.log', level=logging.INFO)
 
 	conx = ConnectAPI()
 	
