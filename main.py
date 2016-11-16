@@ -100,7 +100,7 @@ def main():
 			logging.info(' Got no mentions')
 
 		logging.info(' Going to sleep..')
-		time.sleep(60)
+		time.sleep(300)
 		logging.info(' Waking up!')
 
 if __name__ == '__main__':

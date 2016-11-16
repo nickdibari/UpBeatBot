@@ -1,0 +1,2 @@
+beautifulsoup4==4.2.1
+python-twitter==3.1
