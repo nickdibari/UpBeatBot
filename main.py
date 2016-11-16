@@ -24,7 +24,8 @@ def ConnectAPI():
 # POST: Cute image link from cutestpaws.com 
 def GetImage():
 	# Get random animal to search for
-	animals = ['kittens','pugs','cats','gerbils','bunnies','chipmunks','dogs','otters']
+	animals = ['kittens','pugs','cats','gerbils','bunnies','chipmunks','dogs','otters',\
+		'chinchillas', 'red pandas']
 	animal = random.choice(animals)
 
 	logging.info(' Gonna get a picture of {0}'.format(animal))
@@ -65,13 +66,13 @@ def GetImage():
 # Main Driver
 def main():
 	logging.basicConfig(filename='dev.log', level=logging.INFO)
-
-	conx = ConnectAPI()
-	
-	if conx:
-		logging.info(' Connected to API OK')
 	
 	while True:
+		conx = ConnectAPI()
+	
+		if conx:
+			logging.info(' Connected to API OK')
+
 		mentions = conx.GetMentions()
 		
 		if mentions:
@@ -88,7 +89,7 @@ def main():
 					status = conx.PostUpdate(text,img)
 
 					if status:
-						logging.info(' Tweeted at {0} OK'.format(user))
+						logging.info(' Tweeted @{0} OK'.format(user))
 					
 					conx.CreateFavorite(status=mention)
 
