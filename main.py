@@ -11,97 +11,107 @@ import requests
 import twitter
 import time
 
-from twitter_auth import *
+from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
+                            ACCESS_TOKEN, ACCESS_TOKEN_SECRET
+
 
 # PRE: N/A
 # POST: Connection to twitter API
+
 def ConnectAPI():
-	api = twitter.Api(CONSUMER_KEY, CONSUMER_SECRET,\
-			  ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-	return api
+    api = twitter.Api(CONSUMER_KEY, CONSUMER_SECRET,
+                      ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+
+    return api
+
 
 # PRE: N/A
-# POST: Cute image link from cutestpaws.com 
+# POST: Cute image link from cutestpaws.com
+
 def GetImage():
-	# Get random animal to search for
-	animals = ['kittens','pugs','cats','gerbils','bunnies','chipmunks','dogs','otters',\
-		'chinchillas', 'red pandas']
-	animal = random.choice(animals)
+    # Get random animal to search for
+    animals = ['kittens', 'pugs', 'cats', 'gerbils', 'bunnies', 'chipmunks',
+               'dogs', 'otters', 'chinchillas', 'red pandas']
+    animal = random.choice(animals)
 
-	logging.info(' Gonna get a picture of {0}'.format(animal))
-	# Get preview page for random animal
-	PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
-	PreHTML.raise_for_status()
+    logging.info(' Gonna get a picture of {0}'.format(animal))
+    # Get preview page for random animal
+    PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
+    PreHTML.raise_for_status()
 
-	PreObject = bs4.BeautifulSoup(PreHTML.text, 'html.parser')
+    PreObject = bs4.BeautifulSoup(PreHTML.text, 'html.parser')
 
-	if PreObject:
-		logging.info(' Got preview page OK')
+    if PreObject:
+        logging.info(' Got preview page OK')
 
-	# Get random picture from preview page
-	photos = PreObject.select('#photos a')
-	choice = random.choice(photos)
+    # Get random picture from preview page
+    photos = PreObject.select('#photos a')
+    choice = random.choice(photos)
 
-	if choice:
-		logging.info(' Got choice of picture OK')
+    if choice:
+        logging.info(' Got choice of picture OK')
 
-	# Get picture page
-	PicHTML = requests.get(choice['href'])
-	PicHTML.raise_for_status()
+    # Get picture page
+    PicHTML = requests.get(choice['href'])
+    PicHTML.raise_for_status()
 
-	PicObject = bs4.BeautifulSoup(PicHTML.text, 'html.parser')
+    PicObject = bs4.BeautifulSoup(PicHTML.text, 'html.parser')
 
-	if PicObject:
-		logging.info(' Got picture page OK')
+    if PicObject:
+        logging.info(' Got picture page OK')
 
-	# Parse picture page for image
-	img = PicObject.select('#single-cute-wrap img')
-	link =  img[0]['src']
+    # Parse picture page for image
+    img = PicObject.select('#single-cute-wrap img')
+    link = img[0]['src']
 
-	if link:
-		logging.info(' Got image link OK')
-	
-	return link
+    if link:
+        logging.info(' Got image link OK')
+
+    return link
+
 
 # Main Driver
+
 def main():
-	logging.basicConfig(filename='dev.log', level=logging.INFO)
-	
-	while True:
-		conx = ConnectAPI()
-	
-		if conx:
-			logging.info(' Connected to API OK')
+    logging.basicConfig(filename='dev.log', level=logging.INFO)
 
-		mentions = conx.GetMentions()
-		
-		if mentions:
-			logging.info(' Got {0} mentions'.format(len(mentions)))
-			for mention in mentions:
-				user = mention.user.screen_name
+    while True:
+        conx = ConnectAPI()
 
-				if not mention.favorited:
-					logging.info(' Gonna tweet @{0}'.format(user))
+        if conx:
+            logging.info(' Connected to API OK')
 
-					text = 'Hey @{0}, hope this brightens your day!'.format(user)
-					img = GetImage()
+        mentions = conx.GetMentions()
 
-					status = conx.PostUpdate(text,img)
+        if mentions:
+            logging.info(' Got {0} mentions'.format(len(mentions)))
+            for mention in mentions:
+                user = mention.user.screen_name
 
-					if status:
-						logging.info(' Tweeted @{0} OK'.format(user))
-					
-					conx.CreateFavorite(status=mention)
+                if not mention.favorited:
+                    logging.info(' Gonna tweet @{0}'.format(user))
 
-				else:
-					logging.info(' Already tweeted @{0}'.format(user))
+                    text = 'Hey @{0}, hope this brightens your day!'\
+                           .format(user)
+                    img = GetImage()
 
-		else:
-			logging.info(' Got no mentions')
+                    status = conx.PostUpdate(text, img)
 
-		logging.info(' Going to sleep..')
-		time.sleep(300)
-		logging.info(' Waking up!')
+                    if status:
+                        logging.info(' Tweeted @{0} OK'.format(user))
+
+                    conx.CreateFavorite(status=mention)
+
+                else:
+                    logging.info(' Already tweeted @{0}'.format(user))
+
+        else:
+            logging.info(' Got no mentions')
+
+        logging.info(' Going to sleep..')
+        time.sleep(300)
+        logging.info(' Waking up!')
+
 
 if __name__ == '__main__':
-	main()
+    main()
