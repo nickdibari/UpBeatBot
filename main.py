@@ -7,11 +7,11 @@
 import bs4
 import twitter
 
-from datetime import datetime
+from datetime import datetime as dt
 import logging
 import random
 import requests
-import time
+import time as t
 
 from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
                             ACCESS_TOKEN, ACCESS_TOKEN_SECRET
@@ -79,10 +79,8 @@ def main():
 
     i = 0
     while True:
-        logging.info(' --Pass: {0} | {1}--'.format(i, datetime.now()
-                                                              .strftime('%b %d\
-                                                              , %Y @ %H:%M:%S'
-                                                                        )))
+        time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
+        logging.info(' --Pass: {0} | {1}--'.format(i, time))
         conx = ConnectAPI()
 
         if conx:
@@ -116,7 +114,7 @@ def main():
             logging.info(' Got no mentions')
 
         logging.info(' Going to sleep..')
-        time.sleep(300)
+        t.sleep(300)
         logging.info(' Waking up!')
         logging.info(' -----------------')
         i += 1  # increment pass number variable
