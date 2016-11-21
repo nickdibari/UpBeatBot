@@ -5,10 +5,12 @@
 # Twitter bot to tweet uplifting things
 
 import bs4
+import twitter
+
+from datetime import datetime
 import logging
 import random
 import requests
-import twitter
 import time
 
 from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
@@ -75,7 +77,12 @@ def GetImage():
 def main():
     logging.basicConfig(filename='dev.log', level=logging.INFO)
 
+    i = 0
     while True:
+        logging.info(' --Pass: {0} | {1}--'.format(i, datetime.now()
+                                                              .strftime('%b %d\
+                                                              , %Y @ %H:%M:%S'
+                                                                        )))
         conx = ConnectAPI()
 
         if conx:
@@ -111,6 +118,8 @@ def main():
         logging.info(' Going to sleep..')
         time.sleep(300)
         logging.info(' Waking up!')
+        logging.info(' -----------------')
+        i += 1  # increment pass number variable
 
 
 if __name__ == '__main__':
