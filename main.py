@@ -81,12 +81,21 @@ def main():
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
         logging.info(' --Pass: {0} | {1}--'.format(i, time))
-        conx = ConnectAPI()
 
-        if conx:
+        try:
+            conx = ConnectAPI()
             logging.info(' Connected to API OK')
 
-        mentions = conx.GetMentions()
+        except:
+            logging.exception(' ERROR Could not connect to API')
+            exit(1)
+
+        try:
+            mentions = conx.GetMentions()
+
+        except:
+            logging.exception(' ERROR Could not get mentions')
+            exit(1)
 
         if mentions:
             logging.info(' Got {0} mentions'.format(len(mentions)))
@@ -100,12 +109,20 @@ def main():
                            .format(user)
                     img = GetImage()
 
-                    status = conx.PostUpdate(text, img)
-
-                    if status:
+                    try:
+                        conx.PostUpdate(text, img)
                         logging.info(' Tweeted @{0} OK'.format(user))
 
-                    conx.CreateFavorite(status=mention)
+                    except:
+                        logging.exception(' ERROR Could not tweet')
+                        exit(1)
+
+                    try:
+                        conx.CreateFavorite(status=mention)
+
+                    except:
+                        logging.exception(' ERROR Could not favroite mention')
+                        exit(1)
 
                 else:
                     logging.info(' Already tweeted @{0}'.format(user))
