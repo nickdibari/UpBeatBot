@@ -11,6 +11,7 @@ from datetime import datetime as dt
 import logging
 import random
 import requests
+import string
 import time as t
 
 from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
@@ -30,14 +31,31 @@ def ConnectAPI():
 # PRE: N/A
 # POST: Cute image link from cutestpaws.com
 
-def GetImage():
+def GetImage(tweet):
     # Get random animal to search for
-    animals = ['kittens', 'pugs', 'cats', 'gerbils', 'bunnies', 'chipmunks',
-               'dogs', 'otters', 'chinchillas', 'red pandas']
-    animal = random.choice(animals)
+    animals = [
+        'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
+        'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
+        'dog', 'otters', 'otter', 'chinchillas', 'chinchilla', 'red pandas',
+        'red panda', 'squirrel', 'squirrels'
+    ]
+    animal = None
+
+    # Remove punctuation marks from tweet
+    tweet = tweet.translate(None, string.punctuation)
+    print('Post process tweet: {}'.format(tweet))
+
+    for word in tweet.split(' '):
+        if word in animals:
+            animal = word
+            break
+
+    if animal is None:
+        animal = random.choice(animals)
 
     logging.info(' Gonna get a picture of {0}'.format(animal))
-    # Get preview page for random animal
+
+    # Get preview page for animal
     PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
     PreHTML.raise_for_status()
 
@@ -100,14 +118,17 @@ def main():
         if mentions:
             logging.info(' Got {0} mentions'.format(len(mentions)))
             for mention in mentions:
+
                 user = mention.user.screen_name
 
                 if not mention.favorited:
+                    tweet = mention.text
+
                     logging.info(' Gonna tweet @{0}'.format(user))
 
                     text = 'Hey @{0}, hope this brightens your day!'\
                            .format(user)
-                    img = GetImage()
+                    img = GetImage(tweet)
 
                     try:
                         conx.PostUpdate(text, img)
