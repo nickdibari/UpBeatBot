@@ -32,7 +32,7 @@ def ConnectAPI():
 # POST: Cute image link from cutestpaws.com
 
 def GetImage(tweet):
-    # Get random animal to search for
+    # Get animal to search for
     animals = [
         'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
         'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
