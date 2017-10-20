@@ -43,15 +43,13 @@ def GetImage():
 
     PreObject = bs4.BeautifulSoup(PreHTML.text, 'html.parser')
 
-    if PreObject:
-        logging.info(' Got preview page OK')
+    logging.info(' Got preview page OK')
 
     # Get random picture from preview page
     photos = PreObject.select('#photos a')
     choice = random.choice(photos)
 
-    if choice:
-        logging.info(' Got choice of picture OK')
+    logging.info(' Got choice of picture OK')
 
     # Get picture page
     PicHTML = requests.get(choice['href'])
@@ -59,15 +57,13 @@ def GetImage():
 
     PicObject = bs4.BeautifulSoup(PicHTML.text, 'html.parser')
 
-    if PicObject:
-        logging.info(' Got picture page OK')
+    logging.info(' Got picture page OK')
 
     # Parse picture page for image
     img = PicObject.select('#single-cute-wrap img')
     link = img[0]['src']
 
-    if link:
-        logging.info(' Got image link OK')
+    logging.info(' Got image link OK')
 
     return link
 
