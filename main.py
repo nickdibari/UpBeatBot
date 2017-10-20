@@ -76,59 +76,51 @@ def GetImage():
 
 def main():
     logging.basicConfig(filename='dev.log', level=logging.INFO)
+    tweet_text = 'Hey @{0}, hope this brightens your day!'
 
     i = 0
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
-        logging.info(' --Pass: {0} | {1}--'.format(i, time))
+        pass_info = ' --Pass: {0} | {1}--'.format(i, time)
+        logging.info(pass_info)
 
         try:
             conx = ConnectAPI()
             logging.info(' Connected to API OK')
-
-        except:
-            logging.exception(' ERROR Could not connect to API')
-            exit(1)
-
-        try:
             mentions = conx.GetMentions()
 
-        except:
-            logging.exception(' ERROR Could not get mentions')
-            exit(1)
+            if mentions:
+                logging.info(' Got {0} mentions'.format(len(mentions)))
+                for mention in mentions:
+                    user = mention.user.screen_name
 
-        if mentions:
-            logging.info(' Got {0} mentions'.format(len(mentions)))
-            for mention in mentions:
-                user = mention.user.screen_name
+                    if not mention.favorited:
+                        logging.info(' Gonna tweet @{0}'.format(user))
 
-                if not mention.favorited:
-                    logging.info(' Gonna tweet @{0}'.format(user))
+                        text = tweet_text.format(user)
+                        img = GetImage()
 
-                    text = 'Hey @{0}, hope this brightens your day!'\
-                           .format(user)
-                    img = GetImage()
-
-                    try:
                         conx.PostUpdate(text, img)
                         logging.info(' Tweeted @{0} OK'.format(user))
 
-                    except:
-                        logging.exception(' ERROR Could not tweet')
-                        exit(1)
-
-                    try:
                         conx.CreateFavorite(status=mention)
 
-                    except:
-                        logging.exception(' ERROR Could not favroite mention')
-                        exit(1)
+                    else:
+                        logging.info(' Already tweeted @{0}'.format(user))
 
-                else:
-                    logging.info(' Already tweeted @{0}'.format(user))
+            else:
+                logging.info(' Got no mentions')
 
-        else:
-            logging.info(' Got no mentions')
+        except Exception as e:
+            print('Caught some exception at {}').format(pass_info)
+            print('Check logs for more details')
+
+            error_type = type(e[0])
+            url = e[0].url
+
+            logging.warning(' ERROR: Caught exception {}'.format(error_type))
+            logging.warning(' Could not reach url: {}'.format(url))
+            logging.exception(' Full traceback:')
 
         logging.info(' Going to sleep..')
         t.sleep(300)
