@@ -43,7 +43,6 @@ def GetImage(tweet):
 
     # Remove punctuation marks from tweet
     tweet = tweet.translate(None, string.punctuation)
-    print('Post process tweet: {}'.format(tweet))
 
     for word in tweet.split(' '):
         if word in animals:
