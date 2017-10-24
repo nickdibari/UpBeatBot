@@ -30,7 +30,7 @@ def ConnectAPI():
 
 # PRE: User tweet to parse
 # POST: Animal to search for. Match from our list if found; else random animal
-def _get_animal(tweet):
+def get_animal(tweet):
     animals = [
         'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
         'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
@@ -132,7 +132,7 @@ def main():
 
                     text = 'Hey @{0}, hope this brightens your day!'\
                            .format(user)
-                    animal = _get_animal(tweet)
+                    animal = get_animal(tweet)
                     img = GetImage(animal)
 
                     try:
