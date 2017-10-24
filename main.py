@@ -11,6 +11,7 @@ from datetime import datetime as dt
 import logging
 import random
 import requests
+import string
 import time as t
 
 from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
@@ -27,17 +28,38 @@ def ConnectAPI():
     return api
 
 
-# PRE: N/A
-# POST: Cute image link from cutestpaws.com
+# PRE: User tweet to parse
+# POST: Animal to search for. Match from our list if found; else random animal
+def get_animal(tweet):
+    animals = [
+        'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
+        'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
+        'dog', 'otters', 'otter', 'chinchillas', 'chinchilla', 'red pandas',
+        'red panda', 'squirrel', 'squirrels'
+    ]
+    animal = None
 
-def GetImage():
-    # Get random animal to search for
-    animals = ['kittens', 'pugs', 'cats', 'gerbils', 'bunnies', 'chipmunks',
-               'dogs', 'otters', 'chinchillas', 'red pandas']
-    animal = random.choice(animals)
+    # Remove punctuation marks from tweet
+    tweet = tweet.translate(None, string.punctuation)
 
+    for word in tweet.split(' '):
+        if word in animals:
+            animal = word
+            break
+
+    if animal is None:
+        animal = random.choice(animals)
+
+    return animal
+
+
+# PRE: Animal to search for on cutestpaws.com
+# POST: Cute image link to tweet at user
+
+def GetImage(animal):
     logging.info(' Gonna get a picture of {0}'.format(animal))
-    # Get preview page for random animal
+
+    # Get preview page for animal
     PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
     PreHTML.raise_for_status()
 
@@ -100,14 +122,18 @@ def main():
         if mentions:
             logging.info(' Got {0} mentions'.format(len(mentions)))
             for mention in mentions:
+
                 user = mention.user.screen_name
 
                 if not mention.favorited:
+                    tweet = mention.text
+
                     logging.info(' Gonna tweet @{0}'.format(user))
 
                     text = 'Hey @{0}, hope this brightens your day!'\
                            .format(user)
-                    img = GetImage()
+                    animal = get_animal(tweet)
+                    img = GetImage(animal)
 
                     try:
                         conx.PostUpdate(text, img)
