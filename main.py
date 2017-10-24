@@ -65,15 +65,13 @@ def GetImage(animal):
 
     PreObject = bs4.BeautifulSoup(PreHTML.text, 'html.parser')
 
-    if PreObject:
-        logging.info(' Got preview page OK')
+    logging.info(' Got preview page OK')
 
     # Get random picture from preview page
     photos = PreObject.select('#photos a')
     choice = random.choice(photos)
 
-    if choice:
-        logging.info(' Got choice of picture OK')
+    logging.info(' Got choice of picture OK')
 
     # Get picture page
     PicHTML = requests.get(choice['href'])
@@ -81,15 +79,13 @@ def GetImage(animal):
 
     PicObject = bs4.BeautifulSoup(PicHTML.text, 'html.parser')
 
-    if PicObject:
-        logging.info(' Got picture page OK')
+    logging.info(' Got picture page OK')
 
     # Parse picture page for image
     img = PicObject.select('#single-cute-wrap img')
     link = img[0]['src']
 
-    if link:
-        logging.info(' Got image link OK')
+    logging.info(' Got image link OK')
 
     return link
 
@@ -98,63 +94,60 @@ def GetImage(animal):
 
 def main():
     logging.basicConfig(filename='dev.log', level=logging.INFO)
+    tweet_text = 'Hey @{0}, hope this brightens your day!'
 
     i = 0
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
-        logging.info(' --Pass: {0} | {1}--'.format(i, time))
+        pass_info = ' --Pass: {0} | {1}--'.format(i, time)
+        logging.info(pass_info)
 
         try:
+
             conx = ConnectAPI()
             logging.info(' Connected to API OK')
-
-        except:
-            logging.exception(' ERROR Could not connect to API')
-            exit(1)
-
-        try:
             mentions = conx.GetMentions()
 
-        except:
-            logging.exception(' ERROR Could not get mentions')
-            exit(1)
+            if mentions:
+                logging.info(' Got {0} mentions'.format(len(mentions)))
+                for mention in mentions:
+                    user = mention.user.screen_name
 
-        if mentions:
-            logging.info(' Got {0} mentions'.format(len(mentions)))
-            for mention in mentions:
+                    if not mention.favorited:
+                        logging.info(' Gonna tweet @{0}'.format(user))
 
-                user = mention.user.screen_name
+                        text = tweet_text.format(user)
+                        animal = get_animal(tweet)
+                        img = GetImage(animal)
 
-                if not mention.favorited:
-                    tweet = mention.text
-
-                    logging.info(' Gonna tweet @{0}'.format(user))
-
-                    text = 'Hey @{0}, hope this brightens your day!'\
-                           .format(user)
-                    animal = get_animal(tweet)
-                    img = GetImage(animal)
-
-                    try:
                         conx.PostUpdate(text, img)
                         logging.info(' Tweeted @{0} OK'.format(user))
 
-                    except:
-                        logging.exception(' ERROR Could not tweet')
-                        exit(1)
-
-                    try:
                         conx.CreateFavorite(status=mention)
 
-                    except:
-                        logging.exception(' ERROR Could not favroite mention')
-                        exit(1)
+                    else:
+                        logging.info(' Already tweeted @{0}'.format(user))
 
-                else:
-                    logging.info(' Already tweeted @{0}'.format(user))
+            else:
+                logging.info(' Got no mentions')
 
-        else:
-            logging.info(' Got no mentions')
+        except requests.exceptions.ConnectionError as conn_error:
+            print('Caught a ConnectionError at {}').format(pass_info)
+            print('Check logs for more details')
+
+            error_type = type(conn_error[0])
+            url = conn_error[0].url
+
+            logging.warning(' ERROR: Caught exception {}'.format(error_type))
+            logging.warning(' Could not reach url: {}'.format(url))
+            logging.exception(' Full traceback:')
+
+        except Exception as e:
+            print('Caught unaccounted Exception at {}'.format(pass_info))
+            print('DEFINITELY check the logs for deatils')
+
+            logging.critical(' ERROR: unaccounted Exception')
+            logging.exception(' Full traceback:')
 
         logging.info(' Going to sleep..')
         t.sleep(300)
