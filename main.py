@@ -103,6 +103,7 @@ def main():
         logging.info(pass_info)
 
         try:
+
             conx = ConnectAPI()
             logging.info(' Connected to API OK')
             mentions = conx.GetMentions()
@@ -130,15 +131,22 @@ def main():
             else:
                 logging.info(' Got no mentions')
 
-        except Exception as e:
-            print('Caught some exception at {}').format(pass_info)
+        except requests.exceptions.ConnectionError as conn_error:
+            print('Caught a ConnectionError at {}').format(pass_info)
             print('Check logs for more details')
 
-            error_type = type(e[0])
-            url = e[0].url
+            error_type = type(conn_error[0])
+            url = conn_error[0].url
 
             logging.warning(' ERROR: Caught exception {}'.format(error_type))
             logging.warning(' Could not reach url: {}'.format(url))
+            logging.exception(' Full traceback:')
+
+        except Exception as e:
+            print('Caught unaccounted Exception at {}'.format(pass_info))
+            print('DEFINITELY check the logs for deatils')
+
+            logging.critical(' ERROR: unaccounted Exception')
             logging.exception(' Full traceback:')
 
         logging.info(' Going to sleep..')
