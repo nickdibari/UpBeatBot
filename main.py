@@ -3,19 +3,28 @@
 # UpBeatBot
 # Nicholas DiBari
 # Twitter bot to tweet uplifting things
-
-import bs4
-import twitter
-
 from datetime import datetime as dt
 import logging
 import random
-import requests
 import string
-import time as t
+import sys
+from time import sleep
 
-from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
-                            ACCESS_TOKEN, ACCESS_TOKEN_SECRET
+import bs4
+import requests
+import twitter
+
+from twitter_auth import(
+    CONSUMER_KEY,
+    CONSUMER_SECRET,
+    ACCESS_TOKEN,
+    ACCESS_TOKEN_SECRET,
+)
+from api_mock import TwitterAPIMock
+
+
+# Debug config
+DEBUG = '--debug' in sys.argv
 
 
 # PRE: N/A
@@ -57,7 +66,7 @@ def get_animal(tweet):
 # POST: Cute image link to tweet at user
 
 def GetImage(animal):
-    logging.info(' Gonna get a picture of {0}'.format(animal))
+    logging.info(' Gonna get a picture of a {0}'.format(animal))
 
     # Get preview page for animal
     PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
@@ -103,8 +112,11 @@ def main():
         logging.info(pass_info)
 
         try:
+            if DEBUG:
+                conx = TwitterAPIMock()
+            else:
+                conx = ConnectAPI()
 
-            conx = ConnectAPI()
             logging.info(' Connected to API OK')
             mentions = conx.GetMentions()
 
@@ -117,7 +129,7 @@ def main():
                         logging.info(' Gonna tweet @{0}'.format(user))
 
                         text = tweet_text.format(user)
-                        animal = get_animal(tweet)
+                        animal = get_animal(mention.tweet)
                         img = GetImage(animal)
 
                         conx.PostUpdate(text, img)
@@ -150,7 +162,7 @@ def main():
             logging.exception(' Full traceback:')
 
         logging.info(' Going to sleep..')
-        t.sleep(300)
+        sleep(300)
         logging.info(' Waking up!')
         logging.info(' -----------------')
         i += 1  # increment pass number variable
