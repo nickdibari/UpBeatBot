@@ -20,7 +20,7 @@ from twitter_auth import(
     ACCESS_TOKEN,
     ACCESS_TOKEN_SECRET,
 )
-from api_mock import TwitterAPIMock
+from api_mock import TwitterAPIMock, RequestsMock
 
 
 # Debug config
@@ -67,6 +67,9 @@ def get_animal(tweet):
 
 def GetImage(animal):
     logging.info(' Gonna get a picture of a {0}'.format(animal))
+
+    if DEBUG:
+        requests = RequestsMock()
 
     # Get preview page for animal
     PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))

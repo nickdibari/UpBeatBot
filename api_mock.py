@@ -59,3 +59,22 @@ class TwitterAPIMock(object):
         anything in the real version so can be easily mocked
         """
         pass
+
+
+class RequestsMock(object):
+    """
+    Class to mock out the requests library. This negates the dependency on
+    cutestpaws.com to complete the tweet preparation process
+    """
+    pass
+
+    def get(self, url):
+        def dummy_raise_for_status():
+            pass
+
+        resp = Dummy()
+        resp.raise_for_status = dummy_raise_for_status
+        resp.text = """<div id=photos><a href='foo'>Here is a div!</a></div>
+        <div id=single-cute-wrap><img src='bar'>Here is another!</img></div>"""
+
+        return resp
