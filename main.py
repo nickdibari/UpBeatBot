@@ -3,23 +3,34 @@
 # UpBeatBot
 # Nicholas DiBari
 # Twitter bot to tweet uplifting things
-
-import bs4
-import twitter
-
 from datetime import datetime as dt
 import logging
 import random
-import requests
-import time as t
+import string
+import sys
+from time import sleep
 
-from twitter_auth import CONSUMER_KEY, CONSUMER_SECRET,\
-                            ACCESS_TOKEN, ACCESS_TOKEN_SECRET
+import bs4
+import requests
+import twitter
+
+from twitter_auth import (
+    CONSUMER_KEY,
+    CONSUMER_SECRET,
+    ACCESS_TOKEN,
+    ACCESS_TOKEN_SECRET,
+)
+from api_mock import TwitterAPIMock, RequestsMock
+
+# Debug config
+DEBUG = '--debug' in sys.argv
+
+if DEBUG:
+    requests = RequestsMock()
 
 
 # PRE: N/A
 # POST: Connection to twitter API
-
 def ConnectAPI():
     api = twitter.Api(CONSUMER_KEY, CONSUMER_SECRET,
                       ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -27,31 +38,51 @@ def ConnectAPI():
     return api
 
 
-# PRE: N/A
-# POST: Cute image link from cutestpaws.com
+# PRE: User tweet to parse
+# POST: Animal to search for. Match from our list if found; else random animal
+def get_animal(tweet):
+    animals = [
+        'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
+        'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
+        'dog', 'otters', 'otter', 'chinchillas', 'chinchilla', 'red pandas',
+        'red panda', 'squirrel', 'squirrels'
+    ]
+    animal = None
 
-def GetImage():
-    # Get random animal to search for
-    animals = ['kittens', 'pugs', 'cats', 'gerbils', 'bunnies', 'chipmunks',
-               'dogs', 'otters', 'chinchillas', 'red pandas']
-    animal = random.choice(animals)
+    # Remove punctuation marks from tweet
+    tweet = tweet.encode('ascii', 'ignore')  # Convert unicode to str type
+    tweet = tweet.translate(None, string.punctuation)
 
-    logging.info(' Gonna get a picture of {0}'.format(animal))
-    # Get preview page for random animal
+    for word in tweet.split(' '):
+        if word in animals:
+            animal = word
+            break
+
+    if animal is None:
+        animal = random.choice(animals)
+
+    return animal
+
+
+# PRE: Animal to search for on cutestpaws.com
+# POST: Cute image link to tweet at user
+
+def GetImage(animal):
+    logging.info(' Gonna get a picture of a {0}'.format(animal))
+
+    # Get preview page for animal
     PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
     PreHTML.raise_for_status()
 
     PreObject = bs4.BeautifulSoup(PreHTML.text, 'html.parser')
 
-    if PreObject:
-        logging.info(' Got preview page OK')
+    logging.info(' Got preview page OK')
 
     # Get random picture from preview page
     photos = PreObject.select('#photos a')
     choice = random.choice(photos)
 
-    if choice:
-        logging.info(' Got choice of picture OK')
+    logging.info(' Got choice of picture OK')
 
     # Get picture page
     PicHTML = requests.get(choice['href'])
@@ -59,15 +90,13 @@ def GetImage():
 
     PicObject = bs4.BeautifulSoup(PicHTML.text, 'html.parser')
 
-    if PicObject:
-        logging.info(' Got picture page OK')
+    logging.info(' Got picture page OK')
 
     # Parse picture page for image
     img = PicObject.select('#single-cute-wrap img')
     link = img[0]['src']
 
-    if link:
-        logging.info(' Got image link OK')
+    logging.info(' Got image link OK')
 
     return link
 
@@ -76,66 +105,73 @@ def GetImage():
 
 def main():
     logging.basicConfig(filename='dev.log', level=logging.INFO)
+    tweet_text = 'Hey @{0}, hope this brightens your day!'
 
-    i = 0
+    pass_number = 0
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
-        logging.info(' --Pass: {0} | {1}--'.format(i, time))
+        pass_info = ' --Pass: {0} | {1}--'.format(pass_number, time)
+        logging.info(pass_info)
 
         try:
-            conx = ConnectAPI()
+            if DEBUG:
+                conx = TwitterAPIMock()
+            else:
+                conx = ConnectAPI()
+
             logging.info(' Connected to API OK')
-
-        except:
-            logging.exception(' ERROR Could not connect to API')
-            exit(1)
-
-        try:
             mentions = conx.GetMentions()
 
-        except:
-            logging.exception(' ERROR Could not get mentions')
-            exit(1)
+            if mentions:
+                logging.info(' Got {0} mentions'.format(len(mentions)))
 
-        if mentions:
-            logging.info(' Got {0} mentions'.format(len(mentions)))
-            for mention in mentions:
-                user = mention.user.screen_name
+                for mention in mentions:
+                    user = mention.user.screen_name
 
-                if not mention.favorited:
-                    logging.info(' Gonna tweet @{0}'.format(user))
+                    if not mention.favorited:
+                        logging.info(' Gonna tweet @{0}'.format(user))
+                        logging.info(' User tweet: {}'.format(mention.text))
 
-                    text = 'Hey @{0}, hope this brightens your day!'\
-                           .format(user)
-                    img = GetImage()
+                        text = tweet_text.format(user)
+                        animal = get_animal(mention.text)
+                        img = GetImage(animal)
 
-                    try:
-                        conx.PostUpdate(text, img)
-                        logging.info(' Tweeted @{0} OK'.format(user))
+                        # Don't actually tweet the test account
+                        if user != 'upbeatbottest':
+                            conx.PostUpdate(text, img)
+                            logging.info(' Tweeted @{0} OK'.format(user))
 
-                    except:
-                        logging.exception(' ERROR Could not tweet')
-                        exit(1)
-
-                    try:
                         conx.CreateFavorite(status=mention)
 
-                    except:
-                        logging.exception(' ERROR Could not favroite mention')
-                        exit(1)
+                    else:
+                        logging.info(' Already tweeted @{0}'.format(user))
 
-                else:
-                    logging.info(' Already tweeted @{0}'.format(user))
+            else:
+                logging.info(' Got no mentions')
 
-        else:
-            logging.info(' Got no mentions')
+        except requests.exceptions.ConnectionError as conn_error:
+            print('Caught a ConnectionError at {}').format(pass_info)
+            print('Check logs for more details')
+
+            error_type = type(conn_error[0])
+            url = conn_error[0].url
+
+            logging.warning(' ERROR: Caught exception {}'.format(error_type))
+            logging.warning(' Could not reach url: {}'.format(url))
+            logging.exception(' Full traceback:')
+
+        except Exception as e:
+            print('Unaccounted Exception: {} at {}'.format(e, pass_info))
+            print('DEFINITELY check the logs for deatils')
+
+            logging.critical(' ERROR: unaccounted Exception')
+            logging.exception(' Full traceback:')
 
         logging.info(' Going to sleep..')
-        t.sleep(300)
+        sleep(300)
         logging.info(' Waking up!')
         logging.info(' -----------------')
-        i += 1  # increment pass number variable
-
+        pass_number += 1
 
 if __name__ == '__main__':
     main()
