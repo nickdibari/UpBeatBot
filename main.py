@@ -107,10 +107,10 @@ def main():
     logging.basicConfig(filename='dev.log', level=logging.INFO)
     tweet_text = 'Hey @{0}, hope this brightens your day!'
 
-    i = 0
+    pass_number = 0
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
-        pass_info = ' --Pass: {0} | {1}--'.format(i, time)
+        pass_info = ' --Pass: {0} | {1}--'.format(pass_number, time)
         logging.info(pass_info)
 
         try:
@@ -124,6 +124,7 @@ def main():
 
             if mentions:
                 logging.info(' Got {0} mentions'.format(len(mentions)))
+
                 for mention in mentions:
                     user = mention.user.screen_name
 
@@ -170,8 +171,7 @@ def main():
         sleep(300)
         logging.info(' Waking up!')
         logging.info(' -----------------')
-        i += 1  # increment pass number variable
-
+        pass_number += 1
 
 if __name__ == '__main__':
     main()
