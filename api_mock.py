@@ -29,14 +29,14 @@ class TwitterAPIMock(object):
             mention.user = Dummy()
 
             mention.user.screen_name = 'Dummy'
-            mention.tweet = 'Hey @UpBeatBot!'
+            mention.text = 'Hey @UpBeatBot!'
             mention.favorited = True
 
             # Randomly determine to tweet at user
             # Also specify an animal to test that feature
             if random.randint(0, 10) % 2 == 0:
                 mention.favorited = False
-                mention.tweet += ' Send me a a picture of a {animal}'.format(
+                mention.text += ' Send me a a picture of a {animal}'.format(
                     animal=random.choice(
                         ['dog', 'bunny', 'kitten', 'pug', 'squirrel']
                     )
@@ -76,3 +76,11 @@ class RequestsMock(object):
         <div id=single-cute-wrap><img src='bar'>Here is another!</img></div>"""
 
         return resp
+
+    class exceptions(object):
+        """
+        Mock for requests.exceptions
+        Needed to circumvent import of ConnectionError exception
+        """
+        class ConnectionError(object):
+            pass

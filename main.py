@@ -28,6 +28,7 @@ DEBUG = '--debug' in sys.argv
 if DEBUG:
     requests = RequestsMock()
 
+
 # PRE: N/A
 # POST: Connection to twitter API
 def ConnectAPI():
