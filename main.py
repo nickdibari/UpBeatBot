@@ -22,14 +22,14 @@ from twitter_auth import (
 )
 from api_mock import TwitterAPIMock, RequestsMock
 
-
 # Debug config
 DEBUG = '--debug' in sys.argv
 
+if DEBUG:
+    requests = RequestsMock()
 
 # PRE: N/A
 # POST: Connection to twitter API
-
 def ConnectAPI():
     api = twitter.Api(CONSUMER_KEY, CONSUMER_SECRET,
                       ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -49,6 +49,7 @@ def get_animal(tweet):
     animal = None
 
     # Remove punctuation marks from tweet
+    tweet = tweet.encode('ascii', 'ignore')  # Convert unicode to str type
     tweet = tweet.translate(None, string.punctuation)
 
     for word in tweet.split(' '):
@@ -67,9 +68,6 @@ def get_animal(tweet):
 
 def GetImage(animal):
     logging.info(' Gonna get a picture of a {0}'.format(animal))
-
-    if DEBUG:
-        requests = RequestsMock()
 
     # Get preview page for animal
     PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
@@ -130,14 +128,16 @@ def main():
 
                     if not mention.favorited:
                         logging.info(' Gonna tweet @{0}'.format(user))
-                        logging.info(' User tweet: {}'.format(mention.tweet))
+                        logging.info(' User tweet: {}'.format(mention.text))
 
                         text = tweet_text.format(user)
-                        animal = get_animal(mention.tweet)
+                        animal = get_animal(mention.text)
                         img = GetImage(animal)
 
-                        conx.PostUpdate(text, img)
-                        logging.info(' Tweeted @{0} OK'.format(user))
+                        # Don't actually tweet the test account
+                        if user != 'upbeatbottest':
+                            conx.PostUpdate(text, img)
+                            logging.info(' Tweeted @{0} OK'.format(user))
 
                         conx.CreateFavorite(status=mention)
 
@@ -159,7 +159,7 @@ def main():
             logging.exception(' Full traceback:')
 
         except Exception as e:
-            print('Caught unaccounted Exception {} at {}'.format(e, pass_info))
+            print('Unaccounted Exception: {} at {}'.format(e, pass_info))
             print('DEFINITELY check the logs for deatils')
 
             logging.critical(' ERROR: unaccounted Exception')
