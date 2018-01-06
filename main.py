@@ -14,7 +14,7 @@ import bs4
 import requests
 import twitter
 
-from twitter_auth import(
+from twitter_auth import (
     CONSUMER_KEY,
     CONSUMER_SECRET,
     ACCESS_TOKEN,
@@ -130,6 +130,7 @@ def main():
 
                     if not mention.favorited:
                         logging.info(' Gonna tweet @{0}'.format(user))
+                        logging.info(' User tweet: {}'.format(mention.tweet))
 
                         text = tweet_text.format(user)
                         animal = get_animal(mention.tweet)
@@ -158,7 +159,7 @@ def main():
             logging.exception(' Full traceback:')
 
         except Exception as e:
-            print('Caught unaccounted Exception at {}'.format(pass_info))
+            print('Caught unaccounted Exception {} at {}'.format(e, pass_info))
             print('DEFINITELY check the logs for deatils')
 
             logging.critical(' ERROR: unaccounted Exception')
