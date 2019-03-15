@@ -40,6 +40,7 @@ def main():
         logging.info(pass_info)
 
         try:
+            raise Exception('Oh dear')
             if DEBUG:
                 conx = TwitterAPIMock()
             else:
@@ -75,22 +76,24 @@ def main():
                 logging.info(' Got no mentions')
 
         except requests.exceptions.ConnectionError as conn_error:
-            print('Caught a ConnectionError at {}').format(pass_info)
-            print('Check logs for more details')
+            error_type = type(conn_error)
+            url = conn_error.request.url
 
-            error_type = type(conn_error[0])
-            url = conn_error[0].url
+            logging.exception(
+                ' Caught exception {type} trying to reach url: {url} \n'
+                ' Full traceback:'.format(
+                    type=error_type,
+                    url=url
+                )
+            )
 
-            logging.warning(' ERROR: Caught exception {}'.format(error_type))
-            logging.warning(' Could not reach url: {}'.format(url))
-            logging.exception(' Full traceback:')
-
-        except Exception as e:
-            print('Unaccounted Exception: {} at {}'.format(e, pass_info))
-            print('DEFINITELY check the logs for deatils')
-
-            logging.critical(' ERROR: unaccounted Exception')
-            logging.exception(' Full traceback:')
+        except Exception:
+            logging.exception(
+                ' Unhandled exception at pass: {pass_number} \n'
+                ' Full traceback:'.format(
+                    pass_number=pass_number
+                )
+            )
 
         logging.info(' Going to sleep..')
         sleep(300)
