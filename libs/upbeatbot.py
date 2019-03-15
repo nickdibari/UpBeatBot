@@ -26,9 +26,7 @@ class UpBeatBot(object):
             animal = random.choice(self.animals)
 
         # Get preview page for animal
-        preview_html = requests.get(
-            'http://www.cutestpaw.com/?s={0}'.format(animal)
-        )
+        preview_html = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
 
         preview_html.raise_for_status()
 
