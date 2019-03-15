@@ -19,6 +19,13 @@ class UpBeatBot(object):
     ]
 
     def get_cute_animal_picture(self, message=None):
+        """
+        Return a link to a cute picture of an animal. If a message is provided, will try to parse the message for an
+        animal we have registered and try to find a picture of the animal. If the message does not contain an animal
+        we have registered, or is not provided, will search for a random animal from our choices.
+        :param message: (str) Optional message to parse to determine what animal to search for
+        :return: (str) Link to an image of a cute animal
+        """
         if message:
             animal = self._get_animal_from_message(message)
 
@@ -49,6 +56,13 @@ class UpBeatBot(object):
         return link
 
     def _get_animal_from_message(self, message):
+        """
+        Given a message (tweet, comment, post, etc.) parse the string to find if the message contains an animal in
+        our choices list. If we can't find an animal from our choices in the text, return a random animal from our
+        choices list.
+        :param message: (str) Text to search for an animal we have registered
+        :return: (str) Cute animal to be used for retrieving a cute picture
+        """
         animal = None
 
         for char in string.punctuation:
