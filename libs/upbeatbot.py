@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 import random
 import string
 
@@ -10,7 +9,6 @@ class UpBeatBot(object):
     """Source of uplifting media"""
 
     # List of animals to look for in a message
-    # Used by _get_animal_from_message
     animals = [
         'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
         'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
