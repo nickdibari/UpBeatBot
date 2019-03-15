@@ -8,38 +8,28 @@ from time import sleep
 import requests
 import twitter
 
+import settings
 from libs.api_mock import TwitterAPIMock, RequestsMock
 from libs.upbeatbot import UpBeatBot
 
-try:
-    from twitter_auth import (
-        CONSUMER_KEY,
-        CONSUMER_SECRET,
-        ACCESS_TOKEN,
-        ACCESS_TOKEN_SECRET,
-    )
-except ImportError:
-    CONSUMER_KEY = ''
-    CONSUMER_SECRET = ''
-    ACCESS_TOKEN = ''
-    ACCESS_TOKEN_SECRET = ''
 
 logging.basicConfig(filename='dev.log', level=logging.INFO)
 
+
 # Debug config
-DEBUG = '--debug' in sys.argv
+DEBUG = '--debug' in sys.argv or settings.DEBUG
 
 if DEBUG:
     requests = RequestsMock()
 
 
-# PRE: N/A
-# POST: Connection to twitter API
-def ConnectAPI():
-    api = twitter.Api(CONSUMER_KEY, CONSUMER_SECRET,
-                      ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-
-    return api
+def connect_api():
+    return twitter.Api(
+        settings.CONSUMER_KEY,
+        settings.CONSUMER_SECRET,
+        settings.ACCESS_TOKEN,
+        settings.ACCESS_TOKEN_SECRET
+    )
 
 
 def main():
@@ -56,7 +46,7 @@ def main():
             if DEBUG:
                 conx = TwitterAPIMock()
             else:
-                conx = ConnectAPI()
+                conx = connect_api()
 
             logging.info(' Connected to API OK')
             mentions = conx.GetMentions()

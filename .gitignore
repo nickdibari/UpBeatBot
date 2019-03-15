@@ -1,7 +1,6 @@
 *.log
 *.pyc
-
-twitter_auth.py
+.env
 
 venv/
 
