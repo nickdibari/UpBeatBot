@@ -4,6 +4,9 @@ import string
 import bs4
 import requests
 
+import settings
+from libs.api_mock import RequestsMock
+
 
 class UpBeatBot(object):
     """Source of uplifting media"""
@@ -15,6 +18,12 @@ class UpBeatBot(object):
         'dog', 'otters', 'otter', 'chinchillas', 'chinchilla', 'red pandas',
         'red panda', 'squirrel', 'squirrels'
     ]
+
+    def __init__(self, debug=settings.DEBUG):
+        if debug:
+            self.request = RequestsMock()
+        else:
+            self.request = requests
 
     def get_cute_animal_picture(self, message=None):
         """
@@ -31,7 +40,7 @@ class UpBeatBot(object):
             animal = random.choice(self.animals)
 
         # Get preview page for animal
-        preview_html = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
+        preview_html = self.request.get('http://www.cutestpaw.com/?s={0}'.format(animal))
 
         preview_html.raise_for_status()
 
@@ -42,7 +51,7 @@ class UpBeatBot(object):
         choice = random.choice(photos)
 
         # Get picture page
-        picture_html = requests.get(choice['href'])
+        picture_html = self.request.get(choice['href'])
         picture_html.raise_for_status()
 
         picture_soup = bs4.BeautifulSoup(picture_html.text, 'html.parser')

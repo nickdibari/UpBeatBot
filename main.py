@@ -9,7 +9,7 @@ import requests
 import twitter
 
 import settings
-from libs.api_mock import TwitterAPIMock, RequestsMock
+from libs.api_mock import TwitterAPIMock
 from libs.upbeatbot import UpBeatBot
 
 
@@ -18,9 +18,6 @@ logging.basicConfig(filename='dev.log', level=logging.INFO)
 
 # Debug config
 DEBUG = '--debug' in sys.argv or settings.DEBUG
-
-if DEBUG:
-    requests = RequestsMock()
 
 
 def connect_api():
@@ -35,7 +32,7 @@ def connect_api():
 def main():
     tweet_text = 'Hey @{0}, hope this brightens your day!'
     pass_number = 0
-    upbeat_bot = UpBeatBot()
+    upbeat_bot = UpBeatBot(debug=DEBUG)
 
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
