@@ -19,7 +19,7 @@ class UpBeatBot(object):
     ]
 
     def get_cute_animal_picture(self, message=None):
-        if message is not None:
+        if message:
             animal = self._get_animal_from_message(message)
 
         else:
