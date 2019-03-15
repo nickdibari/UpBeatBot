@@ -1,20 +1,15 @@
 #! /usr/bin/env python
 
-# UpBeatBot
-# Nicholas DiBari
-# Twitter bot to tweet uplifting things
 from datetime import datetime as dt
 import logging
-import random
-import string
 import sys
 from time import sleep
 
-import bs4
 import requests
 import twitter
 
 from libs.api_mock import TwitterAPIMock, RequestsMock
+from libs.upbeatbot import UpBeatBot
 
 try:
     from twitter_auth import (
@@ -29,6 +24,7 @@ except ImportError:
     ACCESS_TOKEN = ''
     ACCESS_TOKEN_SECRET = ''
 
+logging.basicConfig(filename='dev.log', level=logging.INFO)
 
 # Debug config
 DEBUG = '--debug' in sys.argv
@@ -46,76 +42,11 @@ def ConnectAPI():
     return api
 
 
-# PRE: User tweet to parse
-# POST: Animal to search for. Match from our list if found; else random animal
-def get_animal(tweet):
-    animals = [
-        'kittens', 'kitten', 'pugs', 'pug', 'cats', 'cat', 'gerbils',
-        'gerbil', 'bunnies', 'bunny', 'chipmunks', 'chipmunk', 'dogs',
-        'dog', 'otters', 'otter', 'chinchillas', 'chinchilla', 'red pandas',
-        'red panda', 'squirrel', 'squirrels'
-    ]
-    animal = None
-
-    # Remove punctuation marks from tweet
-    for char in string.punctuation:
-        tweet = tweet.replace(char, '')
-
-    for word in tweet.split(' '):
-        if word in animals:
-            animal = word
-            break
-
-    if animal is None:
-        animal = random.choice(animals)
-
-    return animal
-
-
-# PRE: Animal to search for on cutestpaws.com
-# POST: Cute image link to tweet at user
-
-def GetImage(animal):
-    logging.info(' Gonna get a picture of a {0}'.format(animal))
-
-    # Get preview page for animal
-    PreHTML = requests.get('http://www.cutestpaw.com/?s={0}'.format(animal))
-    PreHTML.raise_for_status()
-
-    PreObject = bs4.BeautifulSoup(PreHTML.text, 'html.parser')
-
-    logging.info(' Got preview page OK')
-
-    # Get random picture from preview page
-    photos = PreObject.select('#photos a')
-    choice = random.choice(photos)
-
-    logging.info(' Got choice of picture OK')
-
-    # Get picture page
-    PicHTML = requests.get(choice['href'])
-    PicHTML.raise_for_status()
-
-    PicObject = bs4.BeautifulSoup(PicHTML.text, 'html.parser')
-
-    logging.info(' Got picture page OK')
-
-    # Parse picture page for image
-    img = PicObject.select('#single-cute-wrap img')
-    link = img[0]['src']
-
-    logging.info(' Got image link OK')
-
-    return link
-
-
-# Main Driver
-
 def main():
-    logging.basicConfig(filename='dev.log', level=logging.INFO)
     tweet_text = 'Hey @{0}, hope this brightens your day!'
-
     pass_number = 0
+    upbeat_bot = UpBeatBot()
+
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
         pass_info = ' --Pass: {0} | {1}--'.format(pass_number, time)
@@ -141,8 +72,7 @@ def main():
                         logging.info(' User tweet: {}'.format(mention.text))
 
                         text = tweet_text.format(user)
-                        animal = get_animal(mention.text)
-                        img = GetImage(animal)
+                        img = upbeat_bot.get_cute_animal_picture(mention.text)
 
                         # Don't actually tweet the test account
                         if user != 'upbeatbottest':

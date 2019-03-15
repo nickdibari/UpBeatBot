@@ -53,9 +53,8 @@ class UpBeatBot(object):
     def _get_animal_from_message(self, message):
         animal = None
 
-        # Remove punctuation marks from mess
-        message = message.encode('ascii', 'ignore')
-        message = message.translate(None, string.punctuation)
+        for char in string.punctuation:
+            message = message.replace(char, '')
 
         for word in message.split(' '):
             if word in self.animals:
