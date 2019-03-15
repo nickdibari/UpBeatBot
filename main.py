@@ -95,7 +95,7 @@ def main():
             )
 
         logging.info(' Going to sleep..')
-        sleep(300)
+        sleep(settings.SLEEP_TIMEOUT)
         logging.info(' Waking up!')
         logging.info(' -----------------')
         pass_number += 1
