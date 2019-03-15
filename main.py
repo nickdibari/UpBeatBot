@@ -14,7 +14,7 @@ import bs4
 import requests
 import twitter
 
-from api_mock import TwitterAPIMock, RequestsMock
+from libs.api_mock import TwitterAPIMock, RequestsMock
 
 try:
     from twitter_auth import (
