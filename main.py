@@ -24,14 +24,12 @@ if DEBUG:
 
 
 def connect_api():
-    api = twitter.Api(
+    return twitter.Api(
         settings.CONSUMER_KEY,
         settings.CONSUMER_SECRET,
         settings.ACCESS_TOKEN,
         settings.ACCESS_TOKEN_SECRET
     )
-
-    return api
 
 
 def main():
