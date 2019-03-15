@@ -14,13 +14,21 @@ import bs4
 import requests
 import twitter
 
-from twitter_auth import (
-    CONSUMER_KEY,
-    CONSUMER_SECRET,
-    ACCESS_TOKEN,
-    ACCESS_TOKEN_SECRET,
-)
 from api_mock import TwitterAPIMock, RequestsMock
+
+try:
+    from twitter_auth import (
+        CONSUMER_KEY,
+        CONSUMER_SECRET,
+        ACCESS_TOKEN,
+        ACCESS_TOKEN_SECRET,
+    )
+except ImportError:
+    CONSUMER_KEY = ''
+    CONSUMER_SECRET = ''
+    ACCESS_TOKEN = ''
+    ACCESS_TOKEN_SECRET = ''
+
 
 # Debug config
 DEBUG = '--debug' in sys.argv
@@ -50,8 +58,8 @@ def get_animal(tweet):
     animal = None
 
     # Remove punctuation marks from tweet
-    tweet = tweet.encode('ascii', 'ignore')  # Convert unicode to str type
-    tweet = tweet.translate(None, string.punctuation)
+    for char in string.punctuation:
+        tweet = tweet.replace(char, '')
 
     for word in tweet.split(' '):
         if word in animals:
