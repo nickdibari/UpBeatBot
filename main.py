@@ -40,7 +40,6 @@ def main():
         logging.info(pass_info)
 
         try:
-            raise Exception('Oh dear')
             if DEBUG:
                 conx = TwitterAPIMock()
             else:
