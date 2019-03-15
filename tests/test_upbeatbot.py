@@ -1,27 +1,29 @@
 import unittest
 
-from main import get_animal
+from libs.upbeatbot import UpBeatBot
 
 
-class TestGetImage(unittest.TestCase):
-    """Test that the function returns a suitable search option"""
+class TestUpbeatBot(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.upbeat_bot = UpBeatBot()
 
     def test_chosen_animal_returned(self):
         tweet = 'Hey @upbeatbot send me a dog!'
-        animal = get_animal(tweet)
+        animal = self.upbeat_bot._get_animal_from_message(tweet)
 
         self.assertEqual(animal, 'dog')
 
     def test_random_animal_returned_with_text(self):
         tweet = 'Hey @upbeatbot send me a pic!'
-        animal = get_animal(tweet)
+        animal = self.upbeat_bot._get_animal_from_message(tweet)
 
         # Not really a test, just ensuring *something* is returned
         self.assertTrue(animal)
 
     def test_random_returned_no_text(self):
         tweet = '@upbeatbot'  # Minimum viable string
-        animal = get_animal(tweet)
+        animal = self.upbeat_bot._get_animal_from_message(tweet)
 
         # Ditto as above
         self.assertTrue(animal)
