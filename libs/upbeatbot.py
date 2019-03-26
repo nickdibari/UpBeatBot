@@ -84,7 +84,7 @@ class UpBeatBot(object):
         try:
             picture_resp.raise_for_status()
         except HTTPError:
-            logging.warning('Unable to fetch URL: {}'.format(choice['href']), exc_info=True)
+            logging.warning(' Unable to fetch URL: {}'.format(choice['href']), exc_info=True)
             return self.fallback_cute_pictures.get(animal, random.choice(self.fallback_cute_pictures.items()))
 
         picture_soup = bs4.BeautifulSoup(picture_resp.text, 'html.parser')
