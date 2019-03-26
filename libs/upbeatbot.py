@@ -1,11 +1,16 @@
+import logging
 import random
 import string
 
 import bs4
 import requests
+from requests import HTTPError
 
 import settings
 from libs.api_mock import RequestsMock
+
+
+logging.basicConfig(filename='dev.log', level=logging.INFO)
 
 
 class UpBeatBot(object):
@@ -39,22 +44,30 @@ class UpBeatBot(object):
         else:
             animal = random.choice(self.animals)
 
-        # Get preview page for animal
-        preview_html = self.request.get('http://www.cutestpaw.com/?s={0}'.format(animal))
+        animal_url = 'http://www.cutestpaw.com/?s={0}'.format(animal)
+        preview_resp = self.request.get(animal_url)
 
-        preview_html.raise_for_status()
+        try:
+            preview_resp.raise_for_status()
+        except HTTPError:
+            logging.warning('Unable to fetch URL: {}'.format(animal_url), exc_info=True)
+            return ''  # TODO: Return a preset fallback image
 
-        preview_soup = bs4.BeautifulSoup(preview_html.text, 'html.parser')
+        preview_soup = bs4.BeautifulSoup(preview_resp.text, 'html.parser')
 
         # Get random picture from preview page
         photos = preview_soup.select('#photos a')
         choice = random.choice(photos)
 
-        # Get picture page
-        picture_html = self.request.get(choice['href'])
-        picture_html.raise_for_status()
+        picture_resp = self.request.get(choice['href'])
 
-        picture_soup = bs4.BeautifulSoup(picture_html.text, 'html.parser')
+        try:
+            picture_resp.raise_for_status()
+        except HTTPError:
+            logging.warning('Unable to fetch URL: {}'.format(choice['href']), exc_info=True)
+            return  ''  # TODO: Return a preset fall back image
+
+        picture_soup = bs4.BeautifulSoup(picture_resp.text, 'html.parser')
 
         # Parse picture page for image
         img = picture_soup.select('#single-cute-wrap img')
