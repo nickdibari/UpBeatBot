@@ -38,9 +38,9 @@ class TestUpbeatBot(unittest.TestCase):
         mock_response.raise_for_status.side_effect = HTTPError
         mock_request.return_value = mock_response
 
-        picture = self.upbeat_bot.get_cute_animal_picture()
+        picture = self.upbeat_bot.get_cute_animal_picture('cat')
 
-        self.assertIn(picture, list(self.upbeat_bot.fallback_cute_pictures.values()))
+        self.assertEqual(picture, self.upbeat_bot.fallback_cute_pictures['cat'])
 
     @mock.patch('bs4.BeautifulSoup')
     @mock.patch('requests.get')
@@ -54,9 +54,9 @@ class TestUpbeatBot(unittest.TestCase):
         mock_image_response.raise_for_status.side_effect = HTTPError
         mock_request.side_effect = [mock_preview_response, mock_image_response]
 
-        picture = self.upbeat_bot.get_cute_animal_picture()
+        picture = self.upbeat_bot.get_cute_animal_picture('cat')
 
-        self.assertIn(picture, list(self.upbeat_bot.fallback_cute_pictures.values()))
+        self.assertEqual(picture, self.upbeat_bot.fallback_cute_pictures['cat'])
 
     def test_get_animal_from_message_chosen_animal_returned(self):
         tweet = 'Hey @upbeatbot send me a dog!'
