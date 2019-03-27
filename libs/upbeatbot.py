@@ -58,10 +58,12 @@ class UpBeatBot(object):
         :param message: (str) Optional message to parse to determine what animal to search for
         :return: (str) Link to an image of a cute animal
         """
+        animal = None
+
         if message:
             animal = self._get_animal_from_message(message)
 
-        else:
+        if animal is None:
             animal = random.choice(self.animals)
 
         animal_url = 'http://www.cutestpaw.com/?s={0}'.format(animal)
@@ -98,10 +100,9 @@ class UpBeatBot(object):
     def _get_animal_from_message(self, message):
         """
         Given a message (tweet, comment, post, etc.) parse the string to find if the message contains an animal in
-        our choices list. If we can't find an animal from our choices in the text, return a random animal from our
-        choices list.
+        our choices list. If we can't find an animal from our choices in the text, return None
         :param message: (str) Text to search for an animal we have registered
-        :return: (str) Cute animal to be used for retrieving a cute picture
+        :return: (mixed) Animal to search for if found in message, None if no animal was found
         """
         animal = None
 
@@ -112,8 +113,5 @@ class UpBeatBot(object):
             if word in self.animals:
                 animal = word
                 break
-
-        if animal is None:
-            animal = random.choice(self.animals)
 
         return animal

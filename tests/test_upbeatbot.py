@@ -64,16 +64,8 @@ class TestUpbeatBot(unittest.TestCase):
 
         self.assertEqual(animal, 'dog')
 
-    def test__get_animal_from_message_random_animal_returned_with_text(self):
+    def test__get_animal_from_message_returns_None_if_no_animal_found(self):
         tweet = 'Hey @upbeatbot send me a pic!'
         animal = self.upbeat_bot._get_animal_from_message(tweet)
 
-        # Not really a test, just ensuring *something* is returned
-        self.assertTrue(animal)
-
-    def test__get_animal_from_message_random_returned_no_text(self):
-        tweet = '@upbeatbot'  # Minimum viable string
-        animal = self.upbeat_bot._get_animal_from_message(tweet)
-
-        # Ditto as above
-        self.assertTrue(animal)
+        self.assertIsNone(animal)
