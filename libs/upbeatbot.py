@@ -68,7 +68,7 @@ class UpBeatBot(object):
             preview_resp.raise_for_status()
         except HTTPError:
             logging.warning(' Unable to fetch URL: {}'.format(animal_url), exc_info=True)
-            return self.animals.get(animal, random.choice(list(self.animals.values())))
+            return self.animals[animal]
 
         preview_soup = bs4.BeautifulSoup(preview_resp.text, 'html.parser')
 
@@ -82,7 +82,7 @@ class UpBeatBot(object):
             picture_resp.raise_for_status()
         except HTTPError:
             logging.warning(' Unable to fetch URL: {}'.format(choice['href']), exc_info=True)
-            return self.animals.get(animal, random.choice(list(self.animals.values())))
+            return self.animals[animal]
 
         picture_soup = bs4.BeautifulSoup(picture_resp.text, 'html.parser')
 
