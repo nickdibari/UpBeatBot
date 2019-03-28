@@ -40,7 +40,7 @@ class TestUpbeatBot(unittest.TestCase):
 
         picture = self.upbeat_bot.get_cute_animal_picture('cat')
 
-        self.assertEqual(picture, self.upbeat_bot.fallback_cute_pictures['cat'])
+        self.assertEqual(picture, self.upbeat_bot.animals['cat'])
 
     @mock.patch('bs4.BeautifulSoup')
     @mock.patch('requests.get')
@@ -56,7 +56,7 @@ class TestUpbeatBot(unittest.TestCase):
 
         picture = self.upbeat_bot.get_cute_animal_picture('cat')
 
-        self.assertEqual(picture, self.upbeat_bot.fallback_cute_pictures['cat'])
+        self.assertEqual(picture, self.upbeat_bot.animals['cat'])
 
     def test_get_animal_from_message_chosen_animal_returned(self):
         tweet = 'Hey @upbeatbot send me a dog!'

@@ -16,14 +16,9 @@ logging.basicConfig(filename='dev.log', level=logging.INFO)
 class UpBeatBot(object):
     """Source of uplifting media"""
 
-    # List of animals to look for in a message
-    animals = [
-        'bunnies', 'bunny', 'cat', 'cats', 'chinchilla', 'chinchillas', 'chipmunk', 'chipmunks',
-        'dog', 'dogs', 'kitten', 'kittens', 'otter', 'otters', 'pug', 'pugs', 'squirrel', 'squirrels'
-    ]
-
-    # List of pictures to use in case of issues connecting to cutestpaw.com
-    fallback_cute_pictures = {
+    # List of animals we support in our system
+    # Value is a fallback picture to use in case of issues connecting to cutestpaw.com
+    animals = {
         'bunnies': 'http://www.cutestpaw.com/wp-content/uploads/2016/02/Baby-bunnies.jpg',
         'bunny': 'http://www.cutestpaw.com/wp-content/uploads/2016/02/The-teeniest-bunny..jpeg',
         'cat': 'http://www.cutestpaw.com/wp-content/uploads/2016/02/Cats-rule-and-dogs-drool.jpeg',
@@ -64,7 +59,7 @@ class UpBeatBot(object):
             animal = self._get_animal_from_message(message)
 
         if animal is None:
-            animal = random.choice(self.animals)
+            animal = random.choice(list(self.animals.keys()))
 
         animal_url = 'http://www.cutestpaw.com/?s={0}'.format(animal)
         preview_resp = self.request.get(animal_url)
@@ -73,7 +68,7 @@ class UpBeatBot(object):
             preview_resp.raise_for_status()
         except HTTPError:
             logging.warning(' Unable to fetch URL: {}'.format(animal_url), exc_info=True)
-            return self.fallback_cute_pictures.get(animal, random.choice(list(self.fallback_cute_pictures.values())))
+            return self.animals.get(animal, random.choice(list(self.animals.values())))
 
         preview_soup = bs4.BeautifulSoup(preview_resp.text, 'html.parser')
 
@@ -87,7 +82,7 @@ class UpBeatBot(object):
             picture_resp.raise_for_status()
         except HTTPError:
             logging.warning(' Unable to fetch URL: {}'.format(choice['href']), exc_info=True)
-            return self.fallback_cute_pictures.get(animal, random.choice(list(self.fallback_cute_pictures.values())))
+            return self.animals.get(animal, random.choice(list(self.animals.values())))
 
         picture_soup = bs4.BeautifulSoup(picture_resp.text, 'html.parser')
 
@@ -110,7 +105,7 @@ class UpBeatBot(object):
             message = message.replace(char, '')
 
         for word in message.split(' '):
-            if word in self.animals:
+            if word in self.animals.keys():
                 animal = word
                 break
 
