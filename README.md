@@ -5,7 +5,7 @@ Twitter bot to tweet uplifting images at twitter users
 Simply tweet a mention at UpBeatBot (@UpBeatBot) on Twitter to receive a cute picture tweeted at you
 
 ## Running UpBeatBot
-To run UpBeatBot on your own, download the source code and create a .env file that contains your twitter bot's authentication keys
+To run UpBeatBot on your own, download the source code and create a .env file that contains your twitter bot's authentication keys. You can copy the .example_env file to .env and replace with your relevant keys
 
 Follow the guide on https://dev.twitter.com/oauth/overview/application-owner-access-tokens to register your app and get credentials
 
