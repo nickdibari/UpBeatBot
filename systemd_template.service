@@ -9,7 +9,7 @@ RestartSec=300
 User={{ YOUR_USER }}
 WorkingDirectory={{ GIT_DIR }}
 Environment=LOG_FILE=system.log
-ExecStart={{ PYTHON_ENV  }} \
+ExecStart={{ PYTHON_ENV }} \
 /home/ndibari/development/UpBeatBot/main.py
 
 [Install]
