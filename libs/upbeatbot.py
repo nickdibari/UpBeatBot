@@ -10,9 +10,6 @@ import settings
 from libs.api_mock import RequestsMock
 
 
-logging.basicConfig(filename='dev.log', level=logging.INFO)
-
-
 class UpBeatBot(object):
     """Source of uplifting media"""
 

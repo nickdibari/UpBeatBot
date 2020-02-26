@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 from datetime import datetime as dt
 import logging
 import sys
@@ -12,8 +10,7 @@ import settings
 from libs.api_mock import TwitterAPIMock
 from libs.upbeatbot import UpBeatBot
 
-
-logging.basicConfig(filename='dev.log', level=logging.INFO)
+logging.basicConfig(filename=settings.LOG_FILE, level=logging.INFO)
 
 
 # Debug config

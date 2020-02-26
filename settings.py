@@ -1,7 +1,10 @@
+import os
+
 from envparse import env
 
 env.read_envfile('.env')
 
+LOG_FILE = os.environ.get('LOG_FILE', 'dev.log')
 DEBUG = env.bool('DEBUG', default=False)
 SLEEP_TIMEOUT = env.int('SLEEP_TIMEOUT', default=300)
 
