@@ -94,7 +94,7 @@ def main():
                 )
             )
 
-        logging.info(' Going to sleep..')
+        logging.info(' Going to sleep for {}s..'.format(settings.SLEEP_TIMEOUT))
         sleep(settings.SLEEP_TIMEOUT)
         logging.info(' Waking up!')
         logging.info(' -----------------')
