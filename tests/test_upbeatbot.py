@@ -1,9 +1,13 @@
+import logging
 import unittest
 from unittest import mock
 
 from requests import HTTPError
 
 from libs.upbeatbot import UpBeatBot
+
+
+logging.disable(logging.CRITICAL)
 
 
 class TestUpbeatBot(unittest.TestCase):
