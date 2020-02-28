@@ -7,7 +7,7 @@ After=network.target local-fs.target
 [Service]
 Type=simple
 Restart=always
-RestartSec=300
+RestartSec=5
 User={{ YOUR_USER }}
 WorkingDirectory={{ GIT_DIR }}
 Environment=LOG_FILE=system.log
