@@ -15,4 +15,3 @@ ExecStart={{ PYTHON_ENV }} \
 
 [Install]
 WantedBy=multi-user.target
-
