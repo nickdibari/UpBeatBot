@@ -6,9 +6,9 @@ from time import sleep
 import requests
 import twitter
 
-import settings
-from libs.api_mock import TwitterAPIMock
-from libs.upbeatbot import UpBeatBot
+from upbeatbot import settings
+from upbeatbot.libs.api_mock import TwitterAPIMock
+from upbeatbot.libs.upbeatbot import UpBeatBot
 
 logging.basicConfig(filename=settings.LOG_FILE, level=logging.INFO)
 

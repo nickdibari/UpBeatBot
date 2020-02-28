@@ -6,8 +6,8 @@ import bs4
 import requests
 from requests import HTTPError
 
-import settings
-from libs.api_mock import RequestsMock
+from upbeatbot import settings
+from upbeatbot.libs.api_mock import RequestsMock
 
 
 class UpBeatBot(object):
