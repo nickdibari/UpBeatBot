@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="upbeatbot",
-    version="0.0.1",
+    version="0.0.2",
     author="Nicholas DIbari",
     author_email="ndibari@fordham.edu",
     description="Twitter bot to tweet uplifting images at twitter users",
@@ -19,4 +19,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    install_requires=[
+        'beautifulsoup4==4.4.0',
+        'envparse==0.2.0',
+        'python-twitter==3.5',
+    ]
 )
