@@ -22,3 +22,15 @@ in the directory UpBeatBot is stored in
 ## Running Unit Tests
 To run the unit tests for this project, enter `python -m unittest discover -v` from the project root. You'll see the output
 of every test method, and if any fail an explanation as to why they failed.
+
+
+## Packing Application
+To build UpBeatBot for publishing to PyPi, you'll need to build and upload the `upbeatbot` package
+
+1. Build the package
+
+`python setup.py bdist bdist_wheel`
+
+2. Upload to PyPi
+
+`python -m twine upload dist/*`
