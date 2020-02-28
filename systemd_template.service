@@ -3,7 +3,6 @@ Description=UpBeatBot service
 Requires=local-fs.target
 After=network.target local-fs.target
 
-
 [Service]
 Type=simple
 Restart=always
