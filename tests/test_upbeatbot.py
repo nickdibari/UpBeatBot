@@ -1,8 +1,5 @@
 import logging
 import unittest
-from unittest import mock
-
-from requests import HTTPError
 
 from libs.upbeatbot import UpBeatBot
 
@@ -15,52 +12,24 @@ class TestUpbeatBot(unittest.TestCase):
     def setUpClass(cls):
         cls.upbeat_bot = UpBeatBot()
 
-    @mock.patch('bs4.BeautifulSoup')
-    @mock.patch('requests.get')
-    def test_get_cute_animal_picture_happy_path(self, mock_request, mock_soup):
-        expected_picture = 'https://cutestpaw.com/cat/happy-pic.jpg'
+    def test_get_cute_animal_picture_with_no_message_returns_random_image(self):
+        img_filename = self.upbeat_bot.get_cute_animal_picture()
 
-        mock_preview_soup = mock.Mock()
-        mock_preview_soup.select.return_value = [{'href' : 'https://example.com'}]
+        # Assert we get an image back
+        self.assertTrue('.jpg' in img_filename)
 
-        mock_picture_soup = mock.Mock()
-        mock_picture_soup.select.return_value = [{'src': expected_picture}]
+    def test_get_cute_animal_picture_for_message_with_no_animal_in_message_returns_random_image(self):
+        img_filename = self.upbeat_bot.get_cute_animal_picture(message='This message has no animal in it')
 
-        mock_soup.side_effect = [mock_preview_soup, mock_picture_soup]
+        # Assert we get an image back
+        self.assertTrue('.jpg' in img_filename)
 
-        mock_preview_response = mock.Mock()
-        mock_image_response = mock.Mock()
-        mock_request.side_effect = [mock_preview_response, mock_image_response]
+    def test_get_cute_animal_picture_for_message_with_animal_in_message_returns_image_for_animal(self):
+        animal = 'cat'
+        img_filename = self.upbeat_bot.get_cute_animal_picture(message='Send me a {}'.format(animal))
 
-        picture = self.upbeat_bot.get_cute_animal_picture()
-
-        self.assertEqual(picture, expected_picture)
-
-    @mock.patch('requests.get')
-    def test_get_cute_animal_picture_fails_fetching_preview(self, mock_request):
-        mock_response = mock.Mock()
-        mock_response.raise_for_status.side_effect = HTTPError
-        mock_request.return_value = mock_response
-
-        picture = self.upbeat_bot.get_cute_animal_picture('cat')
-
-        self.assertEqual(picture, self.upbeat_bot.animals['cat'])
-
-    @mock.patch('bs4.BeautifulSoup')
-    @mock.patch('requests.get')
-    def test_get_cute_animal_picture_fails_fetching_image(self, mock_request, mock_soup):
-        mock_preview_soup = mock.Mock()
-        mock_preview_soup.select.return_value = [{'href' : 'https://example.com'}]
-        mock_soup.return_value = mock_preview_soup
-
-        mock_preview_response = mock.Mock()
-        mock_image_response = mock.Mock()
-        mock_image_response.raise_for_status.side_effect = HTTPError
-        mock_request.side_effect = [mock_preview_response, mock_image_response]
-
-        picture = self.upbeat_bot.get_cute_animal_picture('cat')
-
-        self.assertEqual(picture, self.upbeat_bot.animals['cat'])
+        # Assert we get an image back from the directory for the animal
+        self.assertTrue(animal in img_filename)
 
     def test_get_animal_from_message_chosen_animal_returned(self):
         tweet = 'Hey @upbeatbot send me a dog!'

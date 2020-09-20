@@ -1,9 +1,8 @@
-from datetime import datetime as dt
 import logging
 import sys
+from datetime import datetime as dt
 from time import sleep
 
-import requests
 import twitter
 
 import settings
@@ -29,7 +28,7 @@ def connect_api():
 def main():
     tweet_text = 'Hey @{0}, hope this brightens your day!'
     pass_number = 0
-    upbeat_bot = UpBeatBot(debug=DEBUG)
+    upbeat_bot = UpBeatBot()
 
     while True:
         time = dt.now().strftime('%b %d, %Y @ %H:%M:%S')
@@ -46,41 +45,38 @@ def main():
             mentions = conx.GetMentions()
 
             if mentions:
-                logging.info(' Got {0} mentions'.format(len(mentions)))
+                logging.info(' Got {} mentions'.format(len(mentions)))
 
                 for mention in mentions:
                     user = mention.user.screen_name
 
                     if not mention.favorited:
-                        logging.info(' Gonna tweet @{0}'.format(user))
+                        logging.info(' Gonna tweet @{}'.format(user))
                         logging.info(' User tweet: {}'.format(mention.text))
 
                         text = tweet_text.format(user)
                         img = upbeat_bot.get_cute_animal_picture(mention.text)
+                        logging.info(' Using image: {}'.format(img))
 
                         # Don't actually tweet the test account
                         if user != 'upbeatbottest':
                             conx.PostUpdate(text, img)
-                            logging.info(' Tweeted @{0} OK'.format(user))
+                            logging.info(' Tweeted @{} OK'.format(user))
 
                         conx.CreateFavorite(status=mention)
 
                     else:
-                        logging.info(' Already tweeted @{0}'.format(user))
+                        logging.info(' Already tweeted @{}'.format(user))
 
             else:
                 logging.info(' Got no mentions')
 
-        except requests.exceptions.ConnectionError as conn_error:
+        except twitter.error.TwitterError as conn_error:
             error_type = type(conn_error)
-            url = conn_error.request.url
 
             logging.exception(
-                ' Caught exception {type} trying to reach url: {url} \n'
-                ' Full traceback:'.format(
-                    type=error_type,
-                    url=url
-                )
+                ' Caught exception {type} trying to connect to API at pass: {pass_number} \n'
+                ' Full traceback:'.format(type=error_type, pass_number=pass_number)
             )
 
         except Exception:
