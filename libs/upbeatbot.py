@@ -1,6 +1,6 @@
-import random
 import os
-import string
+import random
+import re
 
 import settings
 
@@ -8,21 +8,23 @@ import settings
 class UpBeatBot(object):
     """Source of uplifting media"""
 
-    # List of animals we support in our system
-    animals = [
-        'bunnies', 'bunny', 'cat', 'cats', 'chinchilla', 'chinchillas', 'chipmunk', 'chipmunks',
-        'dog', 'dogs', 'kitten', 'kittens', 'otter', 'otters', 'pug', 'pugs', 'squirrel', 'squirrels'
-    ]
+    def __init__(self):
+        super().__init__()
+        self.animals = []
+
+        # Build list of animals in our inventory from directories in our image directory
+        for animal in os.listdir(settings.IMAGE_DIRECTORY):
+            self.animals.append(animal)
 
     def get_cute_animal_picture(self, message=None):
         """
-        Return a link to a cute picture of an animal. If a message is provided, will try to parse the message for an
+        Return a filepath to a cute picture of an animal. If a message is provided, will try to parse the message for an
         animal we have registered and try to find a picture of the animal. If the message does not contain an animal
         we have registered, or is not provided, will return a picture for a random animal from our choices.
 
         :param message: (str) Optional message to parse to determine what animal to search for
 
-        :return: (str) Link to an image of a cute animal
+        :return: (str) Filepath to an image of a cute animal in our inventory
         """
         animal = None
 
@@ -40,8 +42,8 @@ class UpBeatBot(object):
 
     def _get_animal_from_message(self, message):
         """
-        Given a message (tweet, comment, post, etc.) parse the string to find if the message contains an animal in
-        our choices list. If we can't find an animal from our choices in the text, return None
+        Given a message parse the string to find if the message contains an animal in our choices list.
+        If we can't find an animal from our choices in the text, return None.
 
         :param message: (str) Text to search for an animal we have registered
 
@@ -49,12 +51,13 @@ class UpBeatBot(object):
         """
         animal = None
 
-        # Strip punctuation characters from message
-        for char in string.punctuation:
-            message = message.replace(char, '')
+        # Try to find an animal from our inventory in the message
+        find_animal_regex = r'({animals})'.format(animals='|'.join(self.animals))
+        ret = re.findall(find_animal_regex, message)
 
-        for word in message.split(' '):
-            if word in self.animals:
-                return word
+        # re.findall return is a list of matching strings in the message
+        # Is an empty list if no match found
+        if ret:
+            animal = random.choice(ret)
 
         return animal

@@ -1,10 +1,6 @@
-import logging
 import unittest
 
 from libs.upbeatbot import UpBeatBot
-
-
-logging.disable(logging.CRITICAL)
 
 
 class TestUpbeatBot(unittest.TestCase):
@@ -31,14 +27,20 @@ class TestUpbeatBot(unittest.TestCase):
         # Assert we get an image back from the directory for the animal
         self.assertTrue(animal in img_filename)
 
-    def test_get_animal_from_message_chosen_animal_returned(self):
+    def test_get_animal_from_message_returns_specified_animal(self):
         tweet = 'Hey @upbeatbot send me a dog!'
         animal = self.upbeat_bot._get_animal_from_message(tweet)
 
         self.assertEqual(animal, 'dog')
 
-    def test__get_animal_from_message_returns_None_if_no_animal_found(self):
+    def test_get_animal_from_message_returns_null_if_no_animal_found(self):
         tweet = 'Hey @upbeatbot send me a pic!'
         animal = self.upbeat_bot._get_animal_from_message(tweet)
 
         self.assertIsNone(animal)
+
+    def test_get_animal_from_message_returns_an_animal_if_multiple_animals_specified(self):
+        tweet = 'Hey @upbeatbot send me a dog or a cat!'
+        animal = self.upbeat_bot._get_animal_from_message(tweet)
+
+        self.assertTrue(animal in ['dog', 'cat'])
